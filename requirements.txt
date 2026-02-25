@@ -1,0 +1,25 @@
+# Python dependencies are not required for this project.
+# The project uses Node.js for both frontend and backend.
+# See README.md for setup instructions.
+
+# Node.js version requirement:
+# node >= 18.0.0
+# npm  >= 9.0.0
+
+# Backend npm packages (backend/package.json):
+express==4.18.x
+bcryptjs==2.4.x
+better-sqlite3==12.6.x
+cors==2.8.x
+dotenv==16.4.x
+jsonwebtoken==9.0.x
+openai==4.47.x
+uuid==9.0.x
+nodemon==3.1.x        # dev dependency
+
+# Frontend npm packages (frontend/package.json):
+next==16.1.x
+react==19.2.x
+react-dom==19.2.x
+recharts==3.7.x
+tailwindcss==4.x      # dev dependency

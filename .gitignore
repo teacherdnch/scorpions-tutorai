@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment variables (never commit secrets!)
+.env
+.env.local
+.env.*.local
+
+# Next.js build output
+.next/
+out/
+
+# SQLite database file (contains live data)
+backend/data/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Next.js cache
+frontend/.next/
