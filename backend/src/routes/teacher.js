@@ -26,9 +26,15 @@ router.get('/students', (req, res) => {
 router.get('/students/:id/analytics', (req, res) => {
     try {
         const studentId = req.params.id;
+        const student = db.prepare('SELECT id, name, email FROM users WHERE id = ?').get(studentId);
         const tests = db.prepare('SELECT * FROM tests WHERE student_id = ? ORDER BY completed_at DESC').all(studentId);
         const recommendations = db.prepare('SELECT * FROM recommendations WHERE student_id = ? ORDER BY created_at DESC LIMIT 5').all(studentId);
-        res.json({ tests, recommendations });
+        const adaptiveSessions = db.prepare(`
+            SELECT id, subject, current_skill, questions_answered, status,
+                   started_at, completed_at, risk_index, risk_level
+            FROM adaptive_sessions WHERE student_id = ? ORDER BY started_at DESC LIMIT 20
+        `).all(studentId);
+        res.json({ student, tests, recommendations, adaptiveSessions });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });

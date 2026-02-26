@@ -22,6 +22,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/teacher', require('./routes/teacher'));
 app.use('/api/tests', require('./routes/tests'));
+app.use('/api/adaptive', require('./routes/adaptive'));
+app.use('/api/mentor', require('./routes/mentor'));
+app.use('/api/oral', require('./routes/oral'));
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Tutorai API is running' });

@@ -42,6 +42,23 @@ export const api = {
     getTestById: (id) => request(`/api/tests/${id}`),
     getSubjects: () => request('/api/tests/subjects'),
 
+    // Adaptive exam
+    startAdaptive: (body) => request('/api/adaptive/start', { method: 'POST', body: JSON.stringify(body) }),
+    answerAdaptive: (sessionId, body) => request(`/api/adaptive/${sessionId}/answer`, { method: 'POST', body: JSON.stringify(body) }),
+    getAdaptiveHistory: () => request('/api/adaptive/history'),
+    sendTelemetry: (sessionId, events) => request(`/api/adaptive/${sessionId}/events`, { method: 'POST', body: JSON.stringify({ events }) }),
+    getAntiCheatReport: (sessionId) => request(`/api/adaptive/${sessionId}/report`),
+
+    // Mentor
+    analyzeMentor: (body) => request('/api/mentor/analyze', { method: 'POST', body: JSON.stringify(body) }),
+    getMentorSession: (id) => request(`/api/mentor/${id}`),
+
+    // Oral exam
+    startOral: (body) => request('/api/oral/start', { method: 'POST', body: JSON.stringify(body) }),
+    submitOralAnswer: (sessionId, body) => request(`/api/oral/${sessionId}/answer`, { method: 'POST', body: JSON.stringify(body) }),
+    getOralHistory: () => request('/api/oral/history'),
+    getOralSession: (id) => request(`/api/oral/${id}`),
+
     // Admin
     generateCode: () => request('/api/admin/codes', { method: 'POST' }),
     getCodes: () => request('/api/admin/codes'),

@@ -4,17 +4,17 @@ import { useRouter } from 'next/navigation';
 import Navbar from '../../../components/Navbar';
 import { api } from '../../../lib/api';
 import { getUser } from '../../../lib/auth';
+import { useLang } from '../../../lib/LangContext';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    BarChart, Bar, Cell
+    BarChart, Bar, Cell,
 } from 'recharts';
-
-const COLORS = ['#ef4444', '#f59e0b', '#7c3aed', '#2563eb', '#10b981'];
 
 export default function StudentDashboard() {
     const router = useRouter();
+    const { t } = useLang();
+    const [progress, setProgress] = useState(null);
     const [user, setUser] = useState(null);
-    const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -22,142 +22,115 @@ export default function StudentDashboard() {
         if (!u) return router.replace('/login');
         if (u.role !== 'student') return router.replace(`/${u.role}/dashboard`);
         setUser(u);
-        api.getTestProgress().then(d => { setData(d); setLoading(false); }).catch(() => setLoading(false));
+        api.getTestProgress()
+            .then(d => { setProgress(d); setLoading(false); })
+            .catch(() => setLoading(false));
     }, [router]);
 
     if (loading) return (
-        <div>
-            <Navbar />
+        <div><Navbar />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 64px)' }}>
                 <div className="spinner" />
             </div>
         </div>
     );
 
-    const trendData = (data?.trend || []).map((t, i) => ({
-        name: `Test ${i + 1}`,
-        score: t.percentage,
-        subject: t.subject_name,
-    }));
+    const statCards = [
+        { label: t('sd.testsTaken'), value: progress?.totalTests ?? 0, icon: '📝', color: '#7c3aed' },
+        { label: t('sd.avgScore'), value: progress?.averageScore != null ? `${progress.averageScore}%` : '—', icon: '📊', color: '#2563eb' },
+        { label: t('sd.weakTopics'), value: progress?.weakTopics?.length ?? 0, icon: '🎯', color: '#f59e0b' },
+        { label: t('sd.recommendations'), value: progress?.recommendations?.length ?? 0, icon: '💡', color: '#10b981' },
+    ];
 
-    const weakTopicsData = (data?.weakTopics || []).map(t => ({
-        topic: t.topic?.length > 15 ? t.topic.slice(0, 15) + '…' : t.topic,
-        wrong: t.wrong_count,
-    }));
-
-    const avg = data?.avgScore ?? 0;
-    const avgColor = avg >= 80 ? '#10b981' : avg >= 60 ? '#f59e0b' : '#ef4444';
+    const scoreTrendData = (progress?.scoreTrend || []).map((s, i) => ({ test: `#${i + 1}`, [t('sd.score')]: s }));
+    const weakTopicsData = (progress?.weakTopics || []).map(w => ({ topic: w.topic, [t('sd.wrongCount')]: w.wrongCount }));
+    const COLORS = ['#7c3aed', '#2563eb', '#f59e0b', '#10b981', '#ef4444'];
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
             <Navbar />
-            <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
-                {/* Header */}
-                <div className="fade-in" style={{ marginBottom: '32px' }}>
+            <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 24px' }}>
+                <div style={{ marginBottom: '32px' }}>
                     <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '6px' }}>
-                        Welcome back, <span className="gradient-text">{user?.name?.split(' ')[0]}</span> 👋
+                        {t('sd.welcome')}, {user?.name?.split(' ')[0]} 👋
                     </h1>
-                    <p style={{ color: 'var(--muted)' }}>Here's your learning progress at a glance</p>
+                    <p style={{ color: 'var(--muted)' }}>{t('sd.subtitle')}</p>
                 </div>
 
                 {/* Stat cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
-                    {[
-                        { label: 'Tests Taken', value: data?.totalTests ?? 0, icon: '📝', color: '#7c3aed' },
-                        { label: 'Average Score', value: `${avg}%`, icon: '🎯', color: avgColor },
-                        { label: 'Weak Topics', value: data?.weakTopics?.length ?? 0, icon: '⚠️', color: '#f59e0b' },
-                        { label: 'Recommendations', value: data?.recommendations?.length ?? 0, icon: '💡', color: '#2563eb' },
-                    ].map(card => (
-                        <div key={card.label} className="stat-card fade-in">
+                    {statCards.map(c => (
+                        <div key={c.label} className="stat-card">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
-                                    <p style={{ color: 'var(--muted)', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>{card.label}</p>
-                                    <p style={{ fontSize: '2rem', fontWeight: '800', color: card.color }}>{card.value}</p>
+                                    <p style={{ color: 'var(--muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>{c.label}</p>
+                                    <p style={{ fontSize: '2.2rem', fontWeight: '800', color: c.color }}>{c.value}</p>
                                 </div>
-                                <span style={{ fontSize: '1.8rem' }}>{card.icon}</span>
+                                <span style={{ fontSize: '1.8rem' }}>{c.icon}</span>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
-                    {/* Score trend */}
-                    <div className="glass" style={{ padding: '24px' }}>
-                        <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '20px' }}>Score Trend</h2>
-                        {trendData.length === 0 ? (
-                            <div style={{ textAlign: 'center', color: 'var(--muted)', padding: '40px 0' }}>
-                                <p style={{ fontSize: '2rem', marginBottom: '8px' }}>📊</p>
-                                <p>No tests yet. Take your first test!</p>
-                                <button className="btn-primary" style={{ marginTop: '16px' }} onClick={() => router.push('/student/test')}>
-                                    Start Test
-                                </button>
+                {progress?.totalTests > 0 ? (
+                    <>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                            {/* Score trend */}
+                            <div className="glass" style={{ padding: '24px' }}>
+                                <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '20px' }}>{t('sd.scoreTrend')}</h2>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <LineChart data={scoreTrendData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(124,58,237,0.1)" />
+                                        <XAxis dataKey="test" tick={{ fill: '#64748b', fontSize: 11 }} />
+                                        <YAxis domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 11 }} />
+                                        <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px' }} />
+                                        <Line type="monotone" dataKey={t('sd.score')} stroke="#7c3aed" strokeWidth={2} dot={{ fill: '#7c3aed', r: 4 }} />
+                                    </LineChart>
+                                </ResponsiveContainer>
                             </div>
-                        ) : (
-                            <ResponsiveContainer width="100%" height={220}>
-                                <LineChart data={trendData}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(124,58,237,0.1)" />
-                                    <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
-                                    <YAxis domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 12 }} />
-                                    <Tooltip
-                                        contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', color: 'var(--text)' }}
-                                        formatter={(v) => [`${v}%`, 'Score']}
-                                    />
-                                    <Line type="monotone" dataKey="score" stroke="#7c3aed" strokeWidth={2.5} dot={{ fill: '#7c3aed', r: 4 }} activeDot={{ r: 6 }} />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        )}
-                    </div>
-
-                    {/* Weak topics */}
-                    <div className="glass" style={{ padding: '24px' }}>
-                        <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '20px' }}>Weak Topics</h2>
-                        {weakTopicsData.length === 0 ? (
-                            <div style={{ textAlign: 'center', color: 'var(--muted)', padding: '40px 0' }}>
-                                <p style={{ fontSize: '2rem', marginBottom: '8px' }}>🌟</p>
-                                <p>No weak topics found. Keep it up!</p>
+                            {/* Weak topics */}
+                            <div className="glass" style={{ padding: '24px' }}>
+                                <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '20px' }}>{t('sd.weakTopicsChart')}</h2>
+                                {weakTopicsData.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={200}>
+                                        <BarChart data={weakTopicsData} layout="vertical">
+                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(124,58,237,0.1)" />
+                                            <XAxis type="number" tick={{ fill: '#64748b', fontSize: 11 }} />
+                                            <YAxis type="category" dataKey="topic" tick={{ fill: '#64748b', fontSize: 11 }} width={80} />
+                                            <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px' }} />
+                                            <Bar dataKey={t('sd.wrongCount')} radius={[0, 4, 4, 0]}>
+                                                {weakTopicsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                ) : <p style={{ color: 'var(--muted)', textAlign: 'center', paddingTop: '60px' }}>—</p>}
                             </div>
-                        ) : (
-                            <ResponsiveContainer width="100%" height={220}>
-                                <BarChart data={weakTopicsData} layout="vertical">
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(124,58,237,0.1)" />
-                                    <XAxis type="number" tick={{ fill: '#64748b', fontSize: 12 }} />
-                                    <YAxis dataKey="topic" type="category" tick={{ fill: '#94a3b8', fontSize: 11 }} width={100} />
-                                    <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', color: 'var(--text)' }} />
-                                    <Bar dataKey="wrong" radius={[0, 4, 4, 0]}>
-                                        {weakTopicsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-                    </div>
-                </div>
-
-                {/* Recommendations */}
-                {data?.recommendations?.length > 0 && (
-                    <div className="glass" style={{ padding: '24px', marginBottom: '32px' }}>
-                        <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '16px' }}>💡 AI Study Recommendations</h2>
-                        <div style={{ display: 'grid', gap: '12px' }}>
-                            {data.recommendations.map((rec, i) => (
-                                <div key={i} style={{
-                                    background: 'var(--surface2)',
-                                    borderRadius: '10px',
-                                    padding: '16px',
-                                    borderLeft: '3px solid var(--purple)',
-                                }}>
-                                    <div className="badge badge-purple" style={{ marginBottom: '6px' }}>{rec.topic}</div>
-                                    <p style={{ color: 'var(--text)', fontSize: '0.9rem', lineHeight: 1.5 }}>{rec.material}</p>
-                                </div>
-                            ))}
                         </div>
+
+                        {/* Recommendations */}
+                        <div className="glass" style={{ padding: '24px' }}>
+                            <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '16px' }}>{t('sd.aiRec')}</h2>
+                            {progress?.recommendations?.length > 0 ? (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
+                                    {progress.recommendations.map((r, i) => (
+                                        <div key={i} style={{ padding: '16px', background: 'var(--surface2)', borderRadius: '10px', borderLeft: '3px solid #7c3aed' }}>
+                                            <div className="badge badge-purple" style={{ marginBottom: '8px' }}>{r.topic}</div>
+                                            <p style={{ color: 'var(--text)', fontSize: '0.875rem', lineHeight: 1.5 }}>{r.material}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>{t('sd.noRec')}</p>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <div className="glass" style={{ padding: '60px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '3rem', marginBottom: '16px' }}>🚀</p>
+                        <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>{t('sd.noTests')}</p>
+                        <button className="btn-primary" onClick={() => router.push('/student/test')}>{t('sd.takeTest')}</button>
                     </div>
                 )}
-
-                {/* CTA */}
-                <div style={{ textAlign: 'center', padding: '32px' }}>
-                    <button className="btn-primary" style={{ fontSize: '1rem', padding: '16px 40px' }} onClick={() => router.push('/student/test')}>
-                        🚀 Take a New Test
-                    </button>
-                </div>
             </main>
         </div>
     );
