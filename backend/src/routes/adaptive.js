@@ -4,6 +4,7 @@ const db = require('../db/index');
 const { requireAuth } = require('../middleware/auth');
 const { generateAdaptiveQuestion } = require('../services/ai');
 const { computeRiskIndex, saveReport, recordEvent, getReport } = require('../services/cheatingDetector');
+const { computeCognitiveProfile, saveCognitiveProfile, getCognitiveProfile } = require('../services/cognitiveAnalytics');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -126,6 +127,13 @@ router.post('/:sessionId/answer', async (req, res) => {
                 if (riskReport) saveReport(riskReport);
             } catch (e) { console.error('Anti-cheat analysis failed:', e.message); }
 
+            // ── Run cognitive analytics ──────────────────────────────────
+            let cogProfile = null;
+            try {
+                cogProfile = computeCognitiveProfile(sessionId);
+                saveCognitiveProfile(cogProfile);
+            } catch (e) { console.error('Cognitive analytics failed:', e.message); }
+
             return res.json({
                 done: true,
                 finalSkill: skillAfter,
@@ -143,6 +151,13 @@ router.post('/:sessionId/answer', async (req, res) => {
                     riskIndex: riskReport.risk_index,
                     riskLevel: riskReport.risk_level,
                     signals: JSON.parse(riskReport.details_json || '{}').signals || [],
+                } : null,
+                cognitiveProfile: cogProfile ? {
+                    confidenceIndex: cogProfile.confidenceIndex,
+                    stressLevel: cogProfile.stressLevel,
+                    profile: cogProfile.profile,
+                    stats: cogProfile.stats,
+                    questionBreakdown: cogProfile.questionBreakdown,
                 } : null,
             });
         }
@@ -210,6 +225,28 @@ router.get('/:sessionId/report', (req, res) => {
         const report = getReport(req.params.sessionId);
         if (!report) return res.status(404).json({ error: 'No report found' });
         res.json({ ...report, details: JSON.parse(report.details_json || '{}') });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// GET /api/adaptive/:sessionId/cognitive  — cognitive profile (teacher/admin/student)
+router.get('/:sessionId/cognitive', (req, res) => {
+    try {
+        const raw = getCognitiveProfile(req.params.sessionId);
+        if (!raw) return res.status(404).json({ error: 'No cognitive profile found' });
+        res.json({
+            ...raw,
+            stats: JSON.parse(raw.stats_json || '{}'),
+            breakdown: JSON.parse(raw.breakdown_json || '[]'),
+            profile: {
+                id: raw.profile_id,
+                label: raw.profile_label,
+                emoji: raw.profile_emoji,
+                color: raw.profile_color,
+                description: raw.profile_desc,
+            },
+        });
     } catch (err) {
         res.status(500).json({ error: 'Server error' });
     }

@@ -125,12 +125,29 @@ function setupDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(session_id) REFERENCES adaptive_sessions(id)
     );
+
+    CREATE TABLE IF NOT EXISTS cognitive_profiles (
+      session_id TEXT PRIMARY KEY,
+      confidence_index REAL NOT NULL DEFAULT 0,
+      stress_level REAL NOT NULL DEFAULT 0,
+      profile_id TEXT NOT NULL DEFAULT 'BALANCED_LEARNER',
+      profile_label TEXT,
+      profile_emoji TEXT,
+      profile_color TEXT,
+      profile_desc TEXT,
+      stats_json TEXT,
+      breakdown_json TEXT,
+      computed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(session_id) REFERENCES adaptive_sessions(id)
+    );
   `);
 
   // Idempotent column additions for existing DBs
   const tryAlter = (sql) => { try { db.exec(sql); } catch (_) { } };
   tryAlter(`ALTER TABLE adaptive_sessions ADD COLUMN risk_index REAL DEFAULT 0`);
   tryAlter(`ALTER TABLE adaptive_sessions ADD COLUMN risk_level TEXT DEFAULT 'low'`);
+  // Cognitive analytics columns — safe to call on existing DBs
+  tryAlter(`ALTER TABLE cheat_events ADD COLUMN event_source TEXT DEFAULT 'adaptive'`);
 
   console.log('Database schema initialized.');
 }
