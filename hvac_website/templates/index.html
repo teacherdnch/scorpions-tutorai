@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="{{ t.lang_code }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t.meta_title }}</title>
+    <meta name="description" content="{{ t.meta_description }}">
+    <meta name="keywords" content="{{ t.meta_keywords }}">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="HVAC Kazakhstan">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ t.meta_title }}">
+    <meta property="og:description" content="{{ t.meta_description }}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="{{ 'ru_RU' if lang == 'ru' else 'kk_KZ' }}">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="/{{ lang }}/">
+
+    <!-- Hreflang for multilingual SEO -->
+    <link rel="alternate" hreflang="ru" href="/ru/">
+    <link rel="alternate" hreflang="kk" href="/kz/">
+    <link rel="alternate" hreflang="x-default" href="/ru/">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HVACBusiness",
+        "name": "HVAC Kazakhstan",
+        "description": "{{ t.meta_description }}",
+        "url": "https://hvac-kz.kz",
+        "telephone": "{{ t.contact_phone_raw }}",
+        "email": "{{ t.contact_email }}",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Алматы",
+            "addressCountry": "KZ"
+        },
+        "areaServed": {
+            "@type": "Country",
+            "name": "Kazakhstan"
+        },
+        "priceRange": "$$",
+        "openingHours": "Mo-Fr 09:00-18:00, Sa 10:00-15:00"
+    }
+    </script>
+</head>
+<body>
+
+<!-- ============================================
+     HEADER — Sticky with CTA
+     ============================================ -->
+<header class="header" id="header">
+    <div class="header-inner">
+        <a href="/{{ lang }}/" class="logo">
+            <div class="logo-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            HVAC KZ
+        </a>
+
+        <nav class="nav" id="mainNav">
+            <a href="#hero">{{ t.nav_home }}</a>
+            <a href="#solutions">{{ t.nav_services }}</a>
+            <a href="#why">{{ t.nav_about }}</a>
+            <a href="#cases">{{ t.nav_cases }}</a>
+            <a href="#process">{{ t.nav_process }}</a>
+            <a href="#contact">{{ t.nav_contact }}</a>
+        </nav>
+
+        <div class="header-actions">
+            <div class="lang-switch">
+                <a href="/ru/" class="{{ 'active' if lang == 'ru' else '' }}">RU</a>
+                <a href="/kz/" class="{{ 'active' if lang == 'kz' else '' }}">ҚЗ</a>
+            </div>
+            <a href="#form" class="btn btn-primary header-cta">{{ t.nav_cta }}</a>
+        </div>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</header>
+
+
+<!-- ============================================
+     1. HERO — Maximum Conversions
+     ============================================ -->
+<section class="hero" id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="hero-badge">HVAC Kazakhstan</div>
+            <h1>{{ t.hero_title }}</h1>
+            <p class="hero-subtitle">{{ t.hero_subtitle }}</p>
+
+            <div class="hero-buttons">
+                <a href="#form" class="btn btn-primary btn-lg">{{ t.hero_cta_primary }}</a>
+                <a href="#" class="btn btn-secondary btn-lg" data-callback>{{ t.hero_cta_secondary }}</a>
+            </div>
+
+            <div class="hero-trust">
+                <div class="trust-item">
+                    <span class="trust-num">{{ t.hero_trust_1_num }}</span>
+                    <span class="trust-text">{{ t.hero_trust_1_text }}</span>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-num">{{ t.hero_trust_2_num }}</span>
+                    <span class="trust-text">{{ t.hero_trust_2_text }}</span>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-num">{{ t.hero_trust_3_num }}</span>
+                    <span class="trust-text">{{ t.hero_trust_3_text }}</span>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-text" style="font-size: 0.8rem;">{{ t.hero_trust_4_text }}</span>
+                </div>
+            </div>
+
+            <div class="hero-cities">{{ t.hero_cities }}</div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hero-graphic">
+                <div class="hero-circle"></div>
+                <div class="hero-circle"></div>
+                <div class="hero-circle"></div>
+                <div class="hero-center-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <!-- Floating info cards -->
+                <div class="float-card">
+                    <div class="float-card-value">-35°C</div>
+                    <div>{{ t.climate_item_1_title if lang == 'ru' else '-35°C' }}</div>
+                </div>
+                <div class="float-card">
+                    <div class="float-card-value">+40°C</div>
+                    <div>{{ 'Экстремальная жара' if lang == 'ru' else 'Экстремалды ыстық' }}</div>
+                </div>
+                <div class="float-card">
+                    <div class="float-card-value">500+</div>
+                    <div>{{ t.hero_trust_2_text }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     2. CLIMATE — Kazakhstan-specific
+     ============================================ -->
+<section class="section section-dark" id="climate">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-label">{{ 'Климат' if lang == 'ru' else 'Климат' }}</span>
+            <h2>{{ t.climate_title }}</h2>
+            <p>{{ t.climate_subtitle }}</p>
+        </div>
+
+        <div class="climate-grid">
+            <div class="climate-card animate-on-scroll">
+                <div class="climate-icon">&#10052;</div>
+                <h3>{{ t.climate_item_1_title }}</h3>
+                <p>{{ t.climate_item_1_desc }}</p>
+            </div>
+            <div class="climate-card animate-on-scroll">
+                <div class="climate-icon">&#9728;</div>
+                <h3>{{ t.climate_item_2_title }}</h3>
+                <p>{{ t.climate_item_2_desc }}</p>
+            </div>
+            <div class="climate-card animate-on-scroll">
+                <div class="climate-icon">&#9889;</div>
+                <h3>{{ t.climate_item_3_title }}</h3>
+                <p>{{ t.climate_item_3_desc }}</p>
+            </div>
+            <div class="climate-card animate-on-scroll">
+                <div class="climate-icon">&#9989;</div>
+                <h3>{{ t.climate_item_4_title }}</h3>
+                <p>{{ t.climate_item_4_desc }}</p>
+            </div>
+        </div>
+
+        <div class="climate-cta">
+            <a href="#form" class="btn btn-primary btn-lg">{{ t.climate_cta }}</a>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     3. SOLUTIONS — Service Cards
+     ============================================ -->
+<section class="section section-gray" id="solutions">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-label">{{ 'Услуги' if lang == 'ru' else 'Қызметтер' }}</span>
+            <h2>{{ t.solutions_title }}</h2>
+            <p>{{ t.solutions_subtitle }}</p>
+        </div>
+
+        <div class="solutions-grid">
+            {% set solutions = [
+                {'icon': '&#127970;', 'title': t.sol_1_title, 'problem': t.sol_1_problem, 'term': t.sol_1_term, 'warranty': t.sol_1_warranty},
+                {'icon': '&#127981;', 'title': t.sol_2_title, 'problem': t.sol_2_problem, 'term': t.sol_2_term, 'warranty': t.sol_2_warranty},
+                {'icon': '&#127860;', 'title': t.sol_3_title, 'problem': t.sol_3_problem, 'term': t.sol_3_term, 'warranty': t.sol_3_warranty},
+                {'icon': '&#127973;', 'title': t.sol_4_title, 'problem': t.sol_4_problem, 'term': t.sol_4_term, 'warranty': t.sol_4_warranty},
+                {'icon': '&#127968;', 'title': t.sol_5_title, 'problem': t.sol_5_problem, 'term': t.sol_5_term, 'warranty': t.sol_5_warranty},
+                {'icon': '&#9881;', 'title': t.sol_6_title, 'problem': t.sol_6_problem, 'term': t.sol_6_term, 'warranty': t.sol_6_warranty}
+            ] %}
+
+            {% for sol in solutions %}
+            <div class="solution-card animate-on-scroll">
+                <div class="solution-icon">{{ sol.icon }}</div>
+                <h3>{{ sol.title }}</h3>
+                <div class="solution-detail">
+                    <span class="solution-detail-label">{{ t.sol_problem_label }}</span>
+                    <span class="solution-detail-value">{{ sol.problem }}</span>
+                </div>
+                <div class="solution-detail">
+                    <span class="solution-detail-label">{{ t.sol_term_label }}</span>
+                    <span class="solution-detail-value">{{ sol.term }}</span>
+                </div>
+                <div class="solution-detail">
+                    <span class="solution-detail-label">{{ t.sol_warranty_label }}</span>
+                    <span class="solution-detail-value">{{ sol.warranty }}</span>
+                </div>
+                <a href="#form" class="btn btn-primary btn-sm">{{ t.sol_cta }}</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     4. WHY US — Trust & Stats
+     ============================================ -->
+<section class="section section-gradient" id="why">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-label">{{ 'Преимущества' if lang == 'ru' else 'Артықшылықтар' }}</span>
+            <h2>{{ t.why_title }}</h2>
+            <p>{{ t.why_subtitle }}</p>
+        </div>
+
+        <div class="why-grid">
+            {% set why_items = [
+                {'icon': '&#128736;', 'title': t.why_1_title, 'desc': t.why_1_desc},
+                {'icon': '&#127942;', 'title': t.why_2_title, 'desc': t.why_2_desc},
+                {'icon': '&#127963;', 'title': t.why_3_title, 'desc': t.why_3_desc},
+                {'icon': '&#128176;', 'title': t.why_4_title, 'desc': t.why_4_desc},
+                {'icon': '&#128221;', 'title': t.why_5_title, 'desc': t.why_5_desc},
+                {'icon': '&#128179;', 'title': t.why_6_title, 'desc': t.why_6_desc}
+            ] %}
+
+            {% for item in why_items %}
+            <div class="why-card animate-on-scroll">
+                <div class="why-icon">{{ item.icon }}</div>
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="stats-bar animate-on-scroll">
+            <div class="stat-item">
+                <div class="stat-num" data-count="{{ t.why_stats_1_num }}">0</div>
+                <div class="stat-label">{{ t.why_stats_1_label }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num" data-count="{{ t.why_stats_2_num }}">0</div>
+                <div class="stat-label">{{ t.why_stats_2_label }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num" data-count="{{ t.why_stats_3_num }}">0</div>
+                <div class="stat-label">{{ t.why_stats_3_label }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num" data-count="{{ t.why_stats_4_num }}">24/7</div>
+                <div class="stat-label">{{ t.why_stats_4_label }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     5. CASES — Projects & Reviews
+     ============================================ -->
+<section class="section" id="cases">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-label">{{ 'Портфолио' if lang == 'ru' else 'Портфолио' }}</span>
+            <h2>{{ t.cases_title }}</h2>
+            <p>{{ t.cases_subtitle }}</p>
+        </div>
+
+        <div class="cases-grid">
+            {% set cases = [
+                {'object': t.case_1_object, 'problem': t.case_1_problem, 'solution': t.case_1_solution, 'result': t.case_1_result},
+                {'object': t.case_2_object, 'problem': t.case_2_problem, 'solution': t.case_2_solution, 'result': t.case_2_result},
+                {'object': t.case_3_object, 'problem': t.case_3_problem, 'solution': t.case_3_solution, 'result': t.case_3_result}
+            ] %}
+
+            {% for case in cases %}
+            <div class="case-card animate-on-scroll">
+                <div class="case-header">
+                    <span>{{ t.case_object_label }}</span>
+                    <h3>{{ case.object }}</h3>
+                </div>
+                <div class="case-body">
+                    <div class="case-row">
+                        <div class="case-label">{{ t.case_problem_label }}</div>
+                        <div class="case-value">{{ case.problem }}</div>
+                    </div>
+                    <div class="case-row">
+                        <div class="case-label">{{ t.case_solution_label }}</div>
+                        <div class="case-value">{{ case.solution }}</div>
+                    </div>
+                    <div class="case-row case-result">
+                        <div class="case-label">{{ t.case_result_label }}</div>
+                        <div class="case-value">{{ case.result }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Reviews -->
+        <div class="reviews-section">
+            <div class="section-header animate-on-scroll" style="margin-top: 32px;">
+                <h2>{{ t.reviews_title }}</h2>
+            </div>
+
+            <div class="reviews-grid">
+                {% set reviews = [
+                    {'text': t.review_1_text, 'author': t.review_1_author, 'company': t.review_1_company},
+                    {'text': t.review_2_text, 'author': t.review_2_author, 'company': t.review_2_company},
+                    {'text': t.review_3_text, 'author': t.review_3_author, 'company': t.review_3_company}
+                ] %}
+
+                {% for review in reviews %}
+                <div class="review-card animate-on-scroll">
+                    <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <p class="review-text">&laquo;{{ review.text }}&raquo;</p>
+                    <div class="review-author">{{ review.author }}</div>
+                    <div class="review-company">{{ review.company }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     6. PROCESS — Work Stages
+     ============================================ -->
+<section class="section section-gray" id="process">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-label">{{ 'Процесс' if lang == 'ru' else 'Процесс' }}</span>
+            <h2>{{ t.process_title }}</h2>
+            <p>{{ t.process_subtitle }}</p>
+        </div>
+
+        <div class="process-timeline">
+            {% set steps = [
+                {'title': t.step_1_title, 'desc': t.step_1_desc},
+                {'title': t.step_2_title, 'desc': t.step_2_desc},
+                {'title': t.step_3_title, 'desc': t.step_3_desc},
+                {'title': t.step_4_title, 'desc': t.step_4_desc},
+                {'title': t.step_5_title, 'desc': t.step_5_desc},
+                {'title': t.step_6_title, 'desc': t.step_6_desc},
+                {'title': t.step_7_title, 'desc': t.step_7_desc}
+            ] %}
+
+            {% for step in steps %}
+            <div class="process-step animate-on-scroll">
+                <div class="step-number">{{ loop.index }}</div>
+                <div class="step-content">
+                    <h3>{{ step.title }}</h3>
+                    <p>{{ step.desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     7. FORM — Lead Capture
+     ============================================ -->
+<section class="section form-section" id="form">
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-info animate-on-scroll">
+                <span class="section-label">{{ 'Заявка' if lang == 'ru' else 'Өтінім' }}</span>
+                <h2>{{ t.form_title }}</h2>
+                <p>{{ t.form_subtitle }}</p>
+
+                <div class="form-trust-items">
+                    <div class="form-trust-item">
+                        <div class="form-trust-icon">&#10003;</div>
+                        <span>{{ t.form_trust }}</span>
+                    </div>
+                    <div class="form-trust-item">
+                        <div class="form-trust-icon">&#10003;</div>
+                        <span>{{ t.why_4_title }}</span>
+                    </div>
+                    <div class="form-trust-item">
+                        <div class="form-trust-icon">&#10003;</div>
+                        <span>{{ t.why_5_title }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="animate-on-scroll">
+                <form class="lead-form" id="leadForm">
+                    <div class="form-group">
+                        <label for="formName">{{ t.form_name }}</label>
+                        <input type="text" id="formName" name="name" placeholder="{{ t.form_name }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formPhone">{{ t.form_phone }}</label>
+                        <input type="tel" id="formPhone" name="phone" placeholder="+7 (___) ___-__-__" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="formCity">{{ t.form_city }}</label>
+                            <select id="formCity" name="city">
+                                <option value="">{{ t.form_city }}</option>
+                                <option value="almaty">{{ t.form_city_almaty }}</option>
+                                <option value="astana">{{ t.form_city_astana }}</option>
+                                <option value="shymkent">{{ t.form_city_shymkent }}</option>
+                                <option value="karaganda">{{ t.form_city_karaganda }}</option>
+                                <option value="aktobe">{{ t.form_city_aktobe }}</option>
+                                <option value="other">{{ t.form_city_other }}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formObjectType">{{ t.form_object_type }}</label>
+                            <select id="formObjectType" name="object_type">
+                                <option value="">{{ t.form_object_type }}</option>
+                                <option value="office">{{ t.form_object_office }}</option>
+                                <option value="production">{{ t.form_object_production }}</option>
+                                <option value="restaurant">{{ t.form_object_restaurant }}</option>
+                                <option value="medical">{{ t.form_object_medical }}</option>
+                                <option value="house">{{ t.form_object_house }}</option>
+                                <option value="other">{{ t.form_object_other }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formArea">{{ t.form_area }}</label>
+                        <input type="number" id="formArea" name="area" placeholder="100" min="1">
+                    </div>
+
+                    <button type="submit" class="btn btn-orange form-submit-btn">{{ t.form_submit }}</button>
+
+                    <div class="form-note">
+                        &#128222; {{ t.form_trust }}
+                    </div>
+                </form>
+
+                <div class="form-success-msg" id="formSuccess">
+                    &#10003; {{ t.form_success }}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     8. CONTACTS
+     ============================================ -->
+<section class="section" id="contact">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-label">{{ 'Контакты' if lang == 'ru' else 'Байланыс' }}</span>
+            <h2>{{ t.contact_title }}</h2>
+            <p>{{ t.contact_subtitle }}</p>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-info animate-on-scroll">
+                <div class="contact-item">
+                    <div class="contact-icon">&#128222;</div>
+                    <div>
+                        <div class="contact-item-label">{{ t.contact_phone_label }}</div>
+                        <div class="contact-item-value">
+                            <a href="tel:{{ t.contact_phone_raw }}">{{ t.contact_phone }}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">&#128172;</div>
+                    <div>
+                        <div class="contact-item-label">{{ t.contact_whatsapp_label }}</div>
+                        <div class="contact-item-value">
+                            <a href="https://wa.me/{{ t.contact_whatsapp_raw }}" target="_blank" rel="noopener">{{ t.contact_whatsapp }}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">&#9993;</div>
+                    <div>
+                        <div class="contact-item-label">{{ t.contact_email_label }}</div>
+                        <div class="contact-item-value">
+                            <a href="mailto:{{ t.contact_email }}">{{ t.contact_email }}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">&#128205;</div>
+                    <div>
+                        <div class="contact-item-label">{{ t.contact_address_label }}</div>
+                        <div class="contact-item-value">{{ t.contact_address }}</div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">&#128339;</div>
+                    <div>
+                        <div class="contact-item-label">{{ t.contact_schedule_label }}</div>
+                        <div class="contact-item-value">{{ t.contact_schedule }}</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 8px;">
+                    <a href="#" class="btn btn-orange" data-callback>{{ t.contact_callback }}</a>
+                </div>
+            </div>
+
+            <div class="contact-map animate-on-scroll">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2906.5!2d76.9286!3d43.2380!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDPCsDE0JzE3LjAiTiA3NsKwNTUnNDMuMCJF!5e0!3m2!1sru!2skz!4v1700000000000!5m2!1sru!2skz"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="HVAC Kazakhstan Office Location">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     FOOTER
+     ============================================ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3>{{ t.footer_company }}</h3>
+                <p>{{ t.footer_desc }}</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>{{ t.footer_links_title }}</h4>
+                <ul>
+                    <li><a href="#hero">{{ t.nav_home }}</a></li>
+                    <li><a href="#solutions">{{ t.nav_services }}</a></li>
+                    <li><a href="#why">{{ t.nav_about }}</a></li>
+                    <li><a href="#cases">{{ t.nav_cases }}</a></li>
+                    <li><a href="#process">{{ t.nav_process }}</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>{{ t.footer_services_title }}</h4>
+                <ul>
+                    <li><a href="#solutions">{{ t.sol_1_title }}</a></li>
+                    <li><a href="#solutions">{{ t.sol_2_title }}</a></li>
+                    <li><a href="#solutions">{{ t.sol_3_title }}</a></li>
+                    <li><a href="#solutions">{{ t.sol_5_title }}</a></li>
+                    <li><a href="#solutions">{{ t.sol_6_title }}</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>{{ t.footer_contact_title }}</h4>
+                <ul>
+                    <li><a href="tel:{{ t.contact_phone_raw }}">{{ t.contact_phone }}</a></li>
+                    <li><a href="https://wa.me/{{ t.contact_whatsapp_raw }}" target="_blank" rel="noopener">WhatsApp</a></li>
+                    <li><a href="mailto:{{ t.contact_email }}">{{ t.contact_email }}</a></li>
+                    <li>{{ t.contact_schedule }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>{{ t.footer_copyright }}</span>
+            <a href="#">{{ t.footer_privacy }}</a>
+        </div>
+    </div>
+</footer>
+
+
+<!-- ============================================
+     WHATSAPP WIDGET
+     ============================================ -->
+<div class="whatsapp-widget">
+    <a href="https://wa.me/{{ t.contact_whatsapp_raw }}" target="_blank" rel="noopener" class="whatsapp-btn" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+    <div class="whatsapp-tooltip">{{ t.wa_tooltip }}</div>
+</div>
+
+
+<!-- ============================================
+     CALLBACK MODAL
+     ============================================ -->
+<div class="modal-overlay" id="callbackModal">
+    <div class="modal">
+        <button class="modal-close" aria-label="{{ t.callback_close }}">&times;</button>
+        <h3>{{ t.callback_title }}</h3>
+        <form id="callbackForm">
+            <div class="form-group">
+                <label for="callbackName">{{ t.callback_name }}</label>
+                <input type="text" id="callbackName" name="name" placeholder="{{ t.callback_name }}">
+            </div>
+            <div class="form-group">
+                <label for="callbackPhone">{{ t.callback_phone }}</label>
+                <input type="tel" id="callbackPhone" name="phone" placeholder="+7 (___) ___-__-__" required>
+            </div>
+            <button type="submit" class="btn btn-orange">{{ t.callback_submit }}</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- Scroll Animation Styles -->
+<style>
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .animate-on-scroll.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .animate-on-scroll:nth-child(2) { transition-delay: 0.1s; }
+    .animate-on-scroll:nth-child(3) { transition-delay: 0.2s; }
+    .animate-on-scroll:nth-child(4) { transition-delay: 0.3s; }
+    .animate-on-scroll:nth-child(5) { transition-delay: 0.4s; }
+    .animate-on-scroll:nth-child(6) { transition-delay: 0.5s; }
+</style>
+
+<!-- JavaScript -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>
